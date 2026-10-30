@@ -50,6 +50,13 @@ const app = express();
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
+const manifest = (name, start, id) => ({ name, short_name: name.slice(0, 14), id, start_url: start, scope: "/", display: "standalone",
+  background_color: "#f4f7f2", theme_color: "#1b8a3d",
+  icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
+          { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }] });
+app.get("/manifest.json", (req, res) => res.type("application/manifest+json").send(JSON.stringify(manifest(SHOP.name, "/", "/"))));
+app.get("/manifest-owner.json", (req, res) => res.type("application/manifest+json").send(JSON.stringify(manifest(SHOP.name + " Admin", "/owner.html", "/owner.html"))));
+
 const COLS = "id,name,brand,category,unit,price,mrp,emoji,in_stock,(image IS NOT NULL) AS has_img,updated_at";
 const shape = r => ({ id: r.id, name: r.name, brand: r.brand, category: r.category, unit: r.unit, price: r.price,
   mrp: r.mrp, emoji: r.emoji, in_stock: !!r.in_stock, img: r.has_img ? "/img/" + r.id + "?v=" + r.updated_at : null });
