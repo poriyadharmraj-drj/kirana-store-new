@@ -2,6 +2,8 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
+<meta name="theme-color" content="#1b8a3d">
+<link rel="manifest" href="/manifest-owner.json"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png">
 <title>Shop Admin</title>
 <link rel="stylesheet" href="style.css">
 <style>
@@ -204,4 +206,5 @@ function renderHist(){
 document.addEventListener("click",function(e){var b=e.target.closest("[data-od]");if(b&&confirm("Delete this order from history?"))api("/api/admin/orders/"+b.dataset.od,"DELETE").then(function(){toast("Deleted");loadHist()})});
 
 if(pw)start();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
 </script></body></html>

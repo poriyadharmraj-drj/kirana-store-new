@@ -2,6 +2,8 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1b8a3d">
+<link rel="manifest" href="/manifest.json"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <title>Order Groceries Online</title>
 <link rel="stylesheet" href="style.css">
 <style>
@@ -97,7 +99,7 @@
 <div class="toast" id="to"></div>
 
 <script>
-var P=[],cart={},cat="All",shop={},$=function(i){return document.getElementById(i)};
+var inst=null,P=[],cart={},cat="All",shop={},$=function(i){return document.getElementById(i)};
 function rs(n){return "₹"+n}
 function esc(t){var d=document.createElement("div");d.textContent=t==null?"":t;return d.innerHTML}
 function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
@@ -118,7 +120,7 @@ function renderDrawer(){
  +'<button data-c="Offers" class="'+(cat==="Offers"?"on":"")+'">🔥 Offers &amp; deals<span class="cnt">'+offers+'</span></button>'
  +Object.keys(c).sort().map(function(k){return '<button data-c="'+esc(k)+'" class="'+(cat===k?"on":"")+'">'+esc(k)+'<span class="cnt">'+c[k]+"</span></button>"}).join("")
  +'<h4>More</h4><button data-go="track">📦 My Orders</button><button data-go="info">🏪 Shop info &amp; timings</button>'
- +(shop.phone?'<button data-go="call">📞 Call shop</button>':"");
+ +(inst?'<button data-go="install">📲 Install app on phone</button>':"")+(shop.phone?'<button data-go="call">📞 Call shop</button>':"");
  $("dl").innerHTML=h;
 }
 function setCat(k){cat=k;renderChips();renderDrawer();renderList(true);closeDr();window.scrollTo({top:0,behavior:"smooth"})}
@@ -128,7 +130,7 @@ $("mb").onclick=openDr;$("sc").onclick=closeDr;
 $("dl").onclick=function(e){var b=e.target.closest("button");if(!b)return;
  if(b.dataset.c)return setCat(b.dataset.c);
  closeDr();var g=b.dataset.go;
- if(g==="track")openT();else if(g==="info")openInfo();else if(g==="call")location.href="tel:"+shop.phone};
+ if(g==="track")openT();else if(g==="info")openInfo();else if(g==="call")location.href="tel:"+shop.phone;else if(g==="install"&&inst){inst.prompt();inst=null;renderDrawer()}};
 $("chips").onclick=function(e){var b=e.target.closest("button");if(b)setCat(b.dataset.c)};
 
 function view(){
@@ -227,4 +229,7 @@ function openInfo(){
  +'<div class="card"><b>How it works</b><p class="msg">1. Add items to cart<br>2. Enter your name &amp; mobile<br>3. We pack your order and call you<br>4. Come to the shop, pay and collect</p></div>';
  $("is").classList.add("on");
 }
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();inst=e;renderDrawer()});
+window.addEventListener("appinstalled",function(){inst=null;renderDrawer()});
+if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
 </script></body></html>
