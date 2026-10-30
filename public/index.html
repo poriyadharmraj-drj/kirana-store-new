@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b8a3d">
+<title>Order Groceries Online</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.wrap{max-width:1100px;margin:0 auto;padding:12px 14px 110px}
+.hero{background:linear-gradient(135deg,var(--br),var(--br2));color:#fff;border-radius:20px;padding:22px 20px;margin-bottom:14px;position:relative;overflow:hidden}
+.hero h1{margin:0 0 6px;font-size:clamp(21px,5vw,32px)}
+.hero p{margin:0 0 12px;opacity:.9;font-size:14px}
+.hero .em{position:absolute;right:14px;top:10px;font-size:54px;animation:float 3s ease-in-out infinite}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{background:rgba(255,255,255,.18);border-radius:999px;padding:5px 12px;font-size:12.5px}
+.tools{display:grid;grid-template-columns:1fr 130px;gap:8px;margin-bottom:6px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr);gap:14px}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
+.pc{background:var(--sf);border:1px solid var(--ln);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;box-shadow:var(--sh);transition:transform .2s}
+.pc:hover{transform:translateY(-3px)}
+.pc.in{animation:up .4s both}
+.pi{position:relative;aspect-ratio:1/1;background:var(--bg);display:grid;place-items:center;font-size:54px;overflow:hidden}
+.pi img{width:100%;height:100%;object-fit:cover;transition:transform .4s}
+.pc:hover .pi img{transform:scale(1.06)}
+.off{position:absolute;top:8px;left:8px;background:var(--rd);color:#fff;font-size:11px;font-weight:800;padding:3px 8px;border-radius:8px}
+.oos{position:absolute;inset:0;background:rgba(0,0,0,.55);color:#fff;display:grid;place-items:center;font-weight:700}
+.pb{padding:10px;display:flex;flex-direction:column;gap:2px;flex:1}
+.br{color:var(--br);font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em}
+.pb b.n{font-size:14.5px;line-height:1.25}
+.pb small{color:var(--mu)}
+.pr{margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+.pr s{color:var(--mu);font-size:12px}
+.pr b{font-size:16px}
+.add{border:1.5px solid var(--br);background:none;color:var(--br);border-radius:10px;padding:7px 14px;font-weight:800;cursor:pointer;transition:all .15s}
+.add:active{background:var(--br);color:#fff}
+.q{display:flex;align-items:center;gap:7px}
+.q button{width:30px;height:30px;border:0;border-radius:9px;background:var(--br);color:#fff;font-size:18px;cursor:pointer}
+.bar{position:fixed;left:12px;right:12px;bottom:12px;max-width:640px;margin:0 auto;background:var(--br);color:#fff;border-radius:16px;padding:13px 16px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:30;cursor:pointer;transform:translateY(120px);transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.bar.on{transform:none}
+.ci{display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--ln)}
+.ci img,.ci .th{width:46px;height:46px;border-radius:10px;object-fit:cover;background:var(--bg);display:grid;place-items:center;font-size:24px}
+.ci .i{flex:1;font-size:14px}
+.ok{text-align:center;padding:10px 0}
+.ok .big{font-size:60px;animation:pop .6s}
+</style></head>
+<body>
+<header class="hd">
+ <button class="ib" id="mb" aria-label="Menu">☰</button><b id="ttl">Kirana Store</b>
+ <button class="ib" id="tk" aria-label="My orders">📦</button>
+ <button class="ib" id="cb" aria-label="Cart">🛒<span class="badge hide" id="bd">0</span></button>
+</header>
+<div class="scrim" id="sc"></div>
+<aside class="drawer" id="dr">
+ <div class="dh"><b id="dn">Kirana Store</b><small>Order online · Pick up at shop</small></div>
+ <div class="dl" id="dl"></div>
+</aside>
+
+<div class="wrap">
+ <div class="hero"><div class="em">🧺</div><h1 id="h1">Fresh groceries, ready when you arrive</h1>
+  <p>Choose items, place your order, and we will call you when it is packed.</p>
+  <div class="pills"><span class="pill">✅ No waiting at counter</span><span class="pill">📞 We call you</span><span class="pill">💰 Pay at shop</span></div></div>
+ <div class="tools"><input id="s" placeholder="🔍 Search product or brand"><select id="so"><option value="">Sort</option><option value="l">Price: Low→High</option><option value="h">Price: High→Low</option><option value="d">Biggest discount</option></select></div>
+ <div class="chips" id="chips"></div>
+ <div id="list"><div class="spin"></div></div>
+</div>
+
+<div class="bar" id="bar"><div><b id="cnt">0 items</b><br><small id="tot">₹0</small></div><b>View Cart ➜</b></div>
+
+<div class="sheet" id="cs"><div class="panel">
+ <div id="cv">
+  <h2>🛒 Your Cart</h2><div id="ci"></div>
+  <div class="row" style="font-weight:700;font-size:16px;margin-top:6px"><span>Total</span><span id="gt">₹0</span></div>
+  <div class="msg" id="sv" style="color:var(--br);font-weight:600"></div>
+  <div class="f" style="margin-top:12px"><label>Your name</label><input id="nm" placeholder="e.g. Rahul"></div>
+  <div class="f"><label>Mobile number (we will call you here)</label><input id="ph" type="tel" inputmode="numeric" maxlength="10" placeholder="10 digit number"></div>
+  <div class="err" id="er"></div>
+  <button class="btn w" id="pl">Place Order</button>
+  <button class="btn s w" style="margin-top:8px" data-x>Close</button>
+ </div>
+ <div id="dv" class="ok hide"><div class="big">✅</div><h2 id="dt">Order placed!</h2>
+  <p class="msg">The shop will call you on your mobile when your order is ready. You can also check <b>📦 My Orders</b> on this phone anytime.</p>
+  <button class="btn w" id="dn2">Done</button></div>
+</div></div>
+
+<div class="sheet" id="ts"><div class="panel">
+ <h2>📦 My Orders</h2>
+ <p class="msg" style="margin-top:-6px">Shows orders placed from this phone.</p>
+ <div id="tr"></div>
+ <button class="btn w" id="tg" style="margin-top:8px">🔄 Refresh</button>
+ <button class="btn s w" data-x style="margin-top:8px">Close</button>
+</div></div>
+
+<div class="sheet" id="is"><div class="panel">
+ <h2>🏪 Shop Info</h2><div id="ib2"></div>
+ <button class="btn s w" data-x style="margin-top:12px">Close</button>
+</div></div>
+<div class="toast" id="to"></div>
+
+<script>
+var P=[],cart={},cat="All",shop={},$=function(i){return document.getElementById(i)};
+function rs(n){return "₹"+n}
+function esc(t){var d=document.createElement("div");d.textContent=t==null?"":t;return d.innerHTML}
+function ls(k,v){try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}}
+function toast(t){var e=$("to");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},2200)}
+try{cart=JSON.parse(ls("cart")||"{}")}catch(e){cart={}}
+
+fetch("/api/shop").then(r=>r.json()).then(s=>{shop=s;$("ttl").textContent=s.name;$("dn").textContent=s.name;document.title=s.name+" – Order Online";$("h1").textContent="Welcome to "+s.name;renderDrawer()});
+fetch("/api/products").then(r=>r.json()).then(p=>{P=p;Object.keys(cart).forEach(function(k){if(!P.find(function(x){return x.id==k&&x.in_stock}))delete cart[k]});renderChips();renderDrawer();renderList(true);bar()}).catch(function(){$("list").innerHTML='<p class="msg">Could not load products. Please refresh.</p>'});
+
+function cats(){var m={};P.forEach(function(p){m[p.category]=(m[p.category]||0)+1});return m}
+function renderChips(){
+ var c=cats(),h=["All","Offers"].concat(Object.keys(c).sort());
+ $("chips").innerHTML=h.map(function(k){return '<button class="chip'+(k===cat?" on":"")+'" data-c="'+esc(k)+'">'+(k==="Offers"?"🔥 ":"")+esc(k)+"</button>"}).join("");
+}
+function renderDrawer(){
+ var c=cats(),offers=P.filter(function(p){return p.mrp>p.price}).length;
+ var h='<h4>Shop by category</h4><button data-c="All" class="'+(cat==="All"?"on":"")+'">🏠 All products<span class="cnt">'+P.length+'</span></button>'
+ +'<button data-c="Offers" class="'+(cat==="Offers"?"on":"")+'">🔥 Offers &amp; deals<span class="cnt">'+offers+'</span></button>'
+ +Object.keys(c).sort().map(function(k){return '<button data-c="'+esc(k)+'" class="'+(cat===k?"on":"")+'">'+esc(k)+'<span class="cnt">'+c[k]+"</span></button>"}).join("")
+ +'<h4>More</h4><button data-go="track">📦 My Orders</button><button data-go="info">🏪 Shop info &amp; timings</button>'
+ +(shop.phone?'<button data-go="call">📞 Call shop</button>':"");
+ $("dl").innerHTML=h;
+}
+function setCat(k){cat=k;renderChips();renderDrawer();renderList(true);closeDr();window.scrollTo({top:0,behavior:"smooth"})}
+function openDr(){$("dr").classList.add("on");$("sc").classList.add("on")}
+function closeDr(){$("dr").classList.remove("on");$("sc").classList.remove("on")}
+$("mb").onclick=openDr;$("sc").onclick=closeDr;
+$("dl").onclick=function(e){var b=e.target.closest("button");if(!b)return;
+ if(b.dataset.c)return setCat(b.dataset.c);
+ closeDr();var g=b.dataset.go;
+ if(g==="track")openT();else if(g==="info")openInfo();else if(g==="call")location.href="tel:"+shop.phone};
+$("chips").onclick=function(e){var b=e.target.closest("button");if(b)setCat(b.dataset.c)};
+
+function view(){
+ var q=$("s").value.toLowerCase().trim(),so=$("so").value;
+ var a=P.filter(function(p){
+  if(cat==="Offers"&&!(p.mrp>p.price))return false;
+  if(cat!=="All"&&cat!=="Offers"&&p.category!==cat)return false;
+  return !q||(p.name+" "+p.brand+" "+p.category).toLowerCase().indexOf(q)>=0});
+ var d=function(p){return p.mrp>p.price?(p.mrp-p.price)/p.mrp:0};
+ if(so==="l")a.sort(function(x,y){return x.price-y.price});
+ if(so==="h")a.sort(function(x,y){return y.price-x.price});
+ if(so==="d")a.sort(function(x,y){return d(y)-d(x)});
+ return a;
+}
+function renderList(anim){
+ var a=view();
+ $("list").innerHTML=a.length?'<div class="grid">'+a.map(function(p,i){
+  var n=cart[p.id]||0,off=p.mrp>p.price?Math.round((p.mrp-p.price)*100/p.mrp):0;
+  var ctl=!p.in_stock?'<small style="color:var(--rd);font-weight:700">Unavailable</small>':n?'<div class="q"><button data-m="'+p.id+'">−</button><b>'+n+'</b><button data-a="'+p.id+'">+</button></div>':'<button class="add" data-a="'+p.id+'">ADD</button>';
+  return '<div class="pc'+(anim?" in":"")+'" style="animation-delay:'+Math.min(i,12)*40+'ms"><div class="pi">'
+   +(p.img?'<img loading="lazy" src="'+esc(p.img)+'" alt="'+esc(p.name)+'">':(p.emoji||"🛒"))
+   +(off?'<span class="off">'+off+'% OFF</span>':"")+(p.in_stock?"":'<div class="oos">Out of stock</div>')+'</div>'
+   +'<div class="pb">'+(p.brand?'<span class="br">'+esc(p.brand)+"</span>":"")+'<b class="n">'+esc(p.name)+"</b>"+(p.unit?"<small>"+esc(p.unit)+"</small>":"")
+   +'<div class="pr"><span><b>'+rs(p.price)+"</b>"+(off?" <s>"+rs(p.mrp)+"</s>":"")+"</span>"+ctl+"</div></div></div>";
+ }).join("")+"</div>":'<p class="msg" style="text-align:center;padding:30px">No products found 😕</p>';
+}
+$("s").oninput=function(){renderList(true)};$("so").onchange=function(){renderList(true)};
+$("list").onclick=function(e){var b=e.target.closest("button");if(!b)return;
+ if(b.dataset.a){var i=b.dataset.a;cart[i]=Math.min((cart[i]||0)+1,50);if(cart[i]===1)toast("Added to cart ✓")}
+ else if(b.dataset.m){var j=b.dataset.m;cart[j]--;if(cart[j]<=0)delete cart[j]}
+ else return;
+ renderList(false);bar(true)};
+
+function lines(){return Object.keys(cart).map(function(i){var p=P.find(function(x){return x.id==i});return p?{p:p,qty:cart[i]}:null}).filter(Boolean)}
+function total(){return lines().reduce(function(a,l){return a+l.qty*l.p.price},0)}
+function bar(bump){
+ ls("cart",JSON.stringify(cart));
+ var c=lines().reduce(function(a,l){return a+l.qty},0);
+ $("cnt").textContent=c+(c===1?" item":" items");$("tot").textContent=rs(total());
+ $("bar").classList.toggle("on",c>0);$("bd").textContent=c;$("bd").classList.toggle("hide",!c);
+ if(bump){$("bd").classList.remove("bump");void $("bd").offsetWidth;$("bd").classList.add("bump")}
+}
+function openCart(){
+ var ls_=lines();if(!ls_.length){toast("Your cart is empty");return}
+ $("cv").classList.remove("hide");$("dv").classList.add("hide");renderCart();
+ $("ph").value=ls("phone")||"";$("nm").value=ls("name")||"";$("er").textContent="";$("cs").classList.add("on");
+}
+function renderCart(){
+ var L=lines(),save=0;
+ $("ci").innerHTML=L.map(function(l){var p=l.p;if(p.mrp>p.price)save+=l.qty*(p.mrp-p.price);
+  return '<div class="ci">'+(p.img?'<img src="'+esc(p.img)+'" alt="">':'<div class="th">'+(p.emoji||"🛒")+"</div>")
+  +'<div class="i"><b>'+esc(p.name)+"</b><br><small class='msg'>"+(p.brand?esc(p.brand)+" · ":"")+rs(p.price)+(p.unit?" · "+esc(p.unit):"")+"</small></div>"
+  +'<div class="q"><button data-m="'+p.id+'">−</button><b>'+l.qty+'</b><button data-a="'+p.id+'">+</button></div><b style="min-width:54px;text-align:right">'+rs(l.qty*p.price)+"</b></div>"}).join("");
+ $("gt").textContent=rs(total());$("sv").textContent=save?"🎉 You save "+rs(save)+" on this order":"";
+}
+$("ci").onclick=function(e){var b=e.target.closest("button");if(!b)return;
+ if(b.dataset.a){cart[b.dataset.a]=Math.min((cart[b.dataset.a]||0)+1,50)}
+ else if(b.dataset.m){cart[b.dataset.m]--;if(cart[b.dataset.m]<=0)delete cart[b.dataset.m]}
+ bar();renderList(false);if(!lines().length){$("cs").classList.remove("on");return}renderCart()};
+$("cb").onclick=openCart;$("bar").onclick=openCart;
+document.querySelectorAll("[data-x]").forEach(function(b){b.onclick=function(){document.querySelectorAll(".sheet").forEach(function(s){s.classList.remove("on")})}});
+document.querySelectorAll(".sheet").forEach(function(s){s.onclick=function(e){if(e.target===s)s.classList.remove("on")}});
+$("pl").onclick=function(){
+ var n=$("nm").value.trim(),p=$("ph").value.trim();
+ if(n.length<2){$("er").textContent="Please enter your name.";return}
+ if(!/^[6-9]\d{9}$/.test(p)){$("er").textContent="Please enter a valid 10-digit mobile number.";return}
+ $("pl").disabled=true;$("pl").textContent="Placing…";
+ fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:n,phone:p,items:lines().map(function(l){return{id:l.p.id,qty:l.qty}})})})
+ .then(function(r){return r.json().then(function(j){return{ok:r.ok,j:j}})}).then(function(x){
+  $("pl").disabled=false;$("pl").textContent="Place Order";
+  if(!x.ok){$("er").textContent=x.j.error||"Could not place order.";return}
+  ls("phone",p);ls("name",n);var mo=mine();mo.unshift({id:x.j.id,token:x.j.token});ls("myorders",JSON.stringify(mo.slice(0,20)));cart={};bar();renderList(false);
+  $("dt").textContent="Order #"+x.j.id+" placed!";$("cv").classList.add("hide");$("dv").classList.remove("hide")
+ }).catch(function(){$("pl").disabled=false;$("pl").textContent="Place Order";$("er").textContent="Network problem. Please try again."});
+};
+$("dn2").onclick=function(){$("cs").classList.remove("on")};
+
+var ST={new:["🕐 Order received","t-new"],ready:["✅ Ready – please collect","t-ready"],done:["Collected","t-done"],cancelled:["Cancelled","t-cancelled"]};
+function mine(){try{return JSON.parse(ls("myorders")||"[]")}catch(e){return[]}}
+function openT(){$("ts").classList.add("on");track()}
+function track(){
+ var L=mine();if(!L.length){$("tr").innerHTML='<p class="msg">No orders yet from this phone. Place an order and it will show here.</p>';return}
+ $("tr").innerHTML='<div class="spin"></div>';
+ fetch("/api/track",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({orders:L})}).then(function(r){return r.json()}).then(function(rows){
+  $("tr").innerHTML=rows.length?rows.map(function(o){var s=ST[o.status]||ST.new;
+   return '<div class="card"><span class="tag '+s[1]+'">'+s[0]+'</span> <small class="msg">#'+o.id+" · "+new Date(o.created_at).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})+"</small>"
+   +o.items.map(function(l){return'<div class="row"><span>'+esc(l.name)+" × "+l.qty+"</span><span>"+rs(l.qty*l.price)+"</span></div>"}).join("")
+   +'<div class="row" style="font-weight:700"><span>Total</span><span>'+rs(o.total)+"</span></div></div>"}).join(""):'<p class="msg">No orders found.</p>'
+ }).catch(function(){$("tr").innerHTML='<p class="err">Network problem.</p>'});
+}
+$("tk").onclick=openT;$("tg").onclick=track;
+function openInfo(){
+ $("ib2").innerHTML='<div class="card"><b>'+esc(shop.name||"")+'</b><div class="row"><span>🕒 Timings</span><span>'+esc(shop.timings||"")+"</span></div>"
+ +(shop.address?'<div class="row"><span>📍 Address</span><span style="text-align:right">'+esc(shop.address)+"</span></div>":"")
+ +(shop.phone?'<div class="row"><span>📞 Phone</span><a href="tel:'+shop.phone+'" style="color:var(--bl)">'+shop.phone+"</a></div>":"")+"</div>"
+ +'<div class="card"><b>How it works</b><p class="msg">1. Add items to cart<br>2. Enter your name &amp; mobile<br>3. We pack your order and call you<br>4. Come to the shop, pay and collect</p></div>';
+ $("is").classList.add("on");
+}
+</script></body></html>
