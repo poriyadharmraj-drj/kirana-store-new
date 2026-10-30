@@ -1,0 +1,15 @@
+[
+  {"n":"Basmati Rice 1kg","p":110,"c":"Atta & Rice","e":"🍚"},
+  {"n":"Wheat Atta 5kg","p":230,"c":"Atta & Rice","e":"🌾"},
+  {"n":"Toor Dal 1kg","p":150,"c":"Dal & Pulses","e":"🫘"},
+  {"n":"Moong Dal 1kg","p":130,"c":"Dal & Pulses","e":"🫘"},
+  {"n":"Sugar 1kg","p":48,"c":"Essentials","e":"🍬"},
+  {"n":"Salt 1kg","p":28,"c":"Essentials","e":"🧂"},
+  {"n":"Sunflower Oil 1L","p":150,"c":"Essentials","e":"🛢️"},
+  {"n":"Tea 250g","p":120,"c":"Beverages","e":"🍵"},
+  {"n":"Milk 500ml","p":30,"c":"Beverages","e":"🥛"},
+  {"n":"Biscuits Pack","p":20,"c":"Snacks","e":"🍪"},
+  {"n":"Namkeen 200g","p":45,"c":"Snacks","e":"🥨"},
+  {"n":"Bath Soap","p":40,"c":"Household","e":"🧼"},
+  {"n":"Detergent 1kg","p":120,"c":"Household","e":"🧺"}
+]
