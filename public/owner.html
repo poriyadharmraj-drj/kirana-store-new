@@ -2,7 +2,7 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#1b8a3d">
+<meta name="theme-color" content="#1565c0">
 <link rel="manifest" href="/manifest-owner.json"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png">
 <title>Shop Admin</title>
 <link rel="stylesheet" href="style.css">
@@ -41,6 +41,7 @@ details.o summary::-webkit-details-marker{display:none}
  <button data-v="orders">📋 Orders <span class="cnt" id="nb">0</span></button>
  <button data-v="prods">🛍 Products</button>
  <button data-v="hist">🕘 History</button>
+ <button data-v="shop">🛒 Customer site</button>
  <h4>Account</h4><button data-v="out">🚪 Logout</button>
 </div></aside>
 
@@ -102,7 +103,7 @@ fetch("/api/shop").then(function(r){return r.json()}).then(function(s){shop=s;$(
 function open_(){$("dr").classList.add("on");$("sc").classList.add("on")}
 function close_(){$("dr").classList.remove("on");$("sc").classList.remove("on")}
 $("mb").onclick=open_;$("sc").onclick=close_;
-$("dr").onclick=function(e){var b=e.target.closest("button");if(!b)return;close_();if(b.dataset.v==="out")return logout();show(b.dataset.v)};
+$("dr").onclick=function(e){var b=e.target.closest("button");if(!b)return;close_();if(b.dataset.v==="out")return logout();if(b.dataset.v==="shop"){location.href="/";return}show(b.dataset.v)};
 function show(v){view=v;["dash","orders","prods","hist"].forEach(function(k){$("v-"+k).classList.toggle("hide",k!==v)});
  document.querySelectorAll(".dl button[data-v]").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
  if(v==="dash")loadDash();if(v==="orders")loadOrders();if(v==="prods")loadProds();if(v==="hist")loadHist()}
@@ -110,7 +111,7 @@ function show(v){view=v;["dash","orders","prods","hist"].forEach(function(k){$("
 // login
 $("go").onclick=function(){pw=$("pw").value;sessionStorage.setItem("pw",pw);$("le").textContent="";start()};
 $("pw").onkeydown=function(e){if(e.key==="Enter")$("go").click()};
-function start(){api("/api/admin/stats").then(function(){$("login").classList.add("hide");$("mb").classList.remove("hide");show(view);clearInterval(timer);timer=setInterval(tick,10000)}).catch(function(e){if(e.message!=="auth")$("le").textContent="Network problem."})}
+function start(){api("/api/admin/stats").then(function(){$("login").classList.add("hide");$("mb").classList.remove("hide");show(view);clearInterval(timer);timer=setInterval(tick,10000)}).catch(function(e){if(e.message!=="auth")$("le").textContent=/fetch|network/i.test(e.message)?"Network problem.":e.message})}
 function logout(){sessionStorage.removeItem("pw");pw="";clearInterval(timer);$("login").classList.remove("hide");$("mb").classList.add("hide");["dash","orders","prods","hist"].forEach(function(k){$("v-"+k).classList.add("hide")});if($("pw").value)$("le").textContent="Wrong password."}
 function tick(){if(view==="dash")loadDash();else if(view==="orders")loadOrders()}
 
