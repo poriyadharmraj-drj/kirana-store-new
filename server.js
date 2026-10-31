@@ -51,7 +51,7 @@ app.use(express.json({ limit: "1mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 const manifest = (name, start, id) => ({ name, short_name: name.slice(0, 14), id, start_url: start, scope: "/", display: "standalone",
-  background_color: "#f4f7f2", theme_color: "#1b8a3d",
+  background_color: "#f1f5fb", theme_color: "#1565c0",
   icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
           { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }] });
 app.get("/manifest.json", (req, res) => res.type("application/manifest+json").send(JSON.stringify(manifest(SHOP.name, "/", "/"))));
@@ -62,8 +62,17 @@ const shape = r => ({ id: r.id, name: r.name, brand: r.brand, category: r.catego
   mrp: r.mrp, emoji: r.emoji, in_stock: !!r.in_stock, img: r.has_img ? "/img/" + r.id + "?v=" + r.updated_at : null });
 const pid = v => parseInt(v, 10) || 0;
 
+app.set("trust proxy", 1);
+const fails = {};
 function admin(req, res, next) {
-  if (req.get("x-admin-password") !== ADMIN_PASSWORD) return res.status(401).json({ error: "Wrong password" });
+  const f = fails[req.ip] || { n: 0, t: 0 };
+  if (Date.now() - f.t > 900000) f.n = 0; // forget after 15 minutes
+  if (f.n >= 10) return res.status(429).json({ error: "Too many wrong attempts. Try again after 15 minutes." });
+  if (req.get("x-admin-password") !== ADMIN_PASSWORD) {
+    f.n++; f.t = Date.now(); fails[req.ip] = f;
+    return res.status(401).json({ error: "Wrong password" });
+  }
+  fails[req.ip] = { n: 0, t: 0 };
   next();
 }
 
