@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1565c0">
+<link rel="manifest" href="/manifest-owner.json"><link rel="icon" href="/icon-192.png"><link rel="apple-touch-icon" href="/icon-192.png">
+<title>Shop Admin</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hd{touch-action:none}
+.wrap{max-width:900px;margin:0 auto;padding:14px 14px 60px}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(3,1fr)}}
+.st{background:var(--sf);border:1px solid var(--ln);border-radius:16px;padding:14px;box-shadow:var(--sh);animation:up .4s both}
+.st small{color:var(--mu)}.st b{display:block;font-size:26px;color:var(--br)}
+.pr{display:flex;gap:12px;align-items:center}
+.pr .th{width:56px;height:56px;border-radius:12px;background:var(--bg);display:grid;place-items:center;font-size:28px;overflow:hidden;flex:none}
+.pr .th img{width:100%;height:100%;object-fit:cover}
+.pr .i{flex:1;min-width:0}.pr .i b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acts{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sw{position:relative;width:46px;height:26px;flex:none}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;margin:0;cursor:pointer;z-index:2}
+.sw i{position:absolute;inset:0;background:var(--ln);border-radius:13px;transition:.2s}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+.sw input:checked+i{background:var(--br)}.sw input:checked+i:after{left:23px}
+.day{margin:16px 2px 6px;font-weight:700;display:flex;justify-content:space-between;color:var(--mu);font-size:14px}
+.sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.sum div{background:var(--sf);border:1px solid var(--ln);border-radius:12px;padding:10px;text-align:center}
+.sum b{display:block;font-size:18px;color:var(--br)}
+.pv{width:90px;height:90px;border-radius:14px;background:var(--bg);display:grid;place-items:center;overflow:hidden;font-size:34px;flex:none}
+.pv img{width:100%;height:100%;object-fit:cover}
+details.o summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:8px;align-items:center}
+details.o summary::-webkit-details-marker{display:none}
+.fab{position:fixed;right:16px;bottom:16px;width:56px;height:56px;border-radius:50%;border:0;background:var(--ac);color:#2a1700;font-size:30px;box-shadow:0 8px 20px rgba(0,0,0,.3);cursor:pointer;z-index:30;animation:pop .5s}
+</style></head>
+<body>
+<header class="hd"><button class="ib hide" id="mb">☰</button><b id="ttl">🛠 Shop Admin</b></header>
+<div class="scrim" id="sc"></div>
+<aside class="drawer" id="dr"><div class="dh"><b>Shop Admin</b><small id="dsub">Manage orders &amp; products</small></div>
+<div class="dl">
+ <button data-v="dash">📊 Dashboard</button>
+ <button data-v="orders">📋 Orders <span class="cnt" id="nb">0</span></button>
+ <button data-v="prods">🛍 Products</button>
+ <button data-v="hist">🕘 History</button>
+ <button data-v="shop">🛒 Customer site</button>
+ <h4>Account</h4><button data-v="out">🚪 Logout</button>
+</div></aside>
+
+<div class="wrap">
+ <div id="login"><div class="card" style="margin-top:30px"><h2 style="margin-top:0">Owner login</h2>
+  <div class="f"><input id="pw" type="password" placeholder="Owner password"></div>
+  <button class="btn w" id="go">Login</button><div class="err" id="le"></div></div></div>
+
+ <div id="v-dash" class="hide"><div class="stats" id="stats"></div><h3>🔔 New orders</h3><div id="dnew"></div></div>
+
+ <div id="v-orders" class="hide"><div class="chips" id="of"></div><div id="ol"></div></div>
+
+ <div id="v-prods" class="hide">
+  <input id="ps" placeholder="🔍 Search products" style="margin-bottom:10px">
+  <div class="msg" id="pc" style="margin-bottom:8px"></div><div id="pl"></div>
+  <button class="fab" id="fab" aria-label="Add product">＋</button>
+ </div>
+
+ <div id="v-hist" class="hide">
+  <div class="g2"><select id="hd"><option value="7">Last 7 days</option><option value="30" selected>Last 30 days</option><option value="90">Last 90 days</option></select>
+  <select id="hs"><option value="">All status</option><option value="new">New</option><option value="ready">Ready</option><option value="done">Collected</option><option value="cancelled">Cancelled</option></select></div>
+  <input id="hq" placeholder="🔍 Search name or mobile" style="margin-top:10px">
+  <div class="sum" id="hsum"></div><div id="hl"></div>
+ </div>
+</div>
+
+<div class="sheet" id="fs"><div class="panel">
+ <h2 id="ft">Add product</h2>
+ <div class="pr" style="margin-bottom:12px"><div class="pv" id="pv">📷</div>
+  <div style="flex:1"><input type="file" id="pf" accept="image/*"><button class="btn s sm" id="rm" style="margin-top:6px">Remove photo</button></div></div>
+ <div class="f"><label>Product name *</label><input id="fn" maxlength="80"></div>
+ <div class="g2"><div class="f"><label>Company / Brand</label><input id="fb" maxlength="40" placeholder="e.g. Tata"></div>
+ <div class="f"><label>Category *</label><input id="fc" list="cl" maxlength="40" placeholder="e.g. Dal &amp; Pulses"><datalist id="cl"></datalist></div></div>
+ <div class="g2"><div class="f"><label>Selling price ₹ *</label><input id="fp" type="number" inputmode="numeric"></div>
+ <div class="f"><label>MRP ₹ (optional)</label><input id="fm" type="number" inputmode="numeric"></div></div>
+ <div class="msg" id="fd" style="margin:-4px 0 8px"></div>
+ <div class="g2"><div class="f"><label>Quantity / unit</label><input id="fu" maxlength="20" placeholder="e.g. 1 kg"></div>
+ <div class="f"><label>Emoji (if no photo)</label><input id="fe" maxlength="4" placeholder="🍚"></div></div>
+ <label style="display:flex;gap:10px;align-items:center;margin:6px 0 10px"><span class="sw"><input type="checkbox" id="fi" checked><i></i></span> In stock</label>
+ <div class="err" id="fr"></div>
+ <button class="btn w" id="fv">Save product</button><button class="btn s w" style="margin-top:8px" data-x>Cancel</button>
+</div></div>
+<div class="toast" id="to"></div>
+
+<script>
+var $=function(i){return document.getElementById(i)},pw=sessionStorage.getItem("pw")||"",O=[],PR=[],shop={},view="dash",ofl="active",seen=-1,timer=null,imgData=null,editId=null,rmImg=false;
+function esc(t){var d=document.createElement("div");d.textContent=t==null?"":t;return d.innerHTML}
+function rs(n){return "₹"+n}
+function toast(t){var e=$("to");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},2200)}
+function api(url,m,b){var o={method:m||"GET",headers:{"x-admin-password":pw}};if(b){o.headers["Content-Type"]="application/json";o.body=JSON.stringify(b)}
+ return fetch(url,o).then(function(r){if(r.status===401){logout();throw new Error("auth")}return r.json().then(function(j){if(!r.ok)throw new Error(j.error||"Error");return j})})}
+function beep(){try{var c=new (window.AudioContext||window.webkitAudioContext)(),o=c.createOscillator();o.connect(c.destination);o.frequency.value=880;o.start();setTimeout(function(){o.stop()},300)}catch(e){}}
+var dt=function(t){return new Date(t).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"})};
+var day=function(t){return new Date(t).toLocaleDateString("en-IN",{weekday:"short",day:"numeric",month:"short",year:"numeric"})};
+var TAG={new:"NEW",ready:"READY",done:"COLLECTED",cancelled:"CANCELLED"};
+fetch("/api/shop").then(function(r){return r.json()}).then(function(s){shop=s;$("ttl").textContent="🛠 "+s.name});
+
+// nav
+var Nav=(function(){
+ var st=[],skip=0,armed=false,onPop=function(){},msg=function(){};
+ function init(p,m){onPop=p;msg=m;
+  if(!(history.state&&history.state.r))history.pushState({r:1},"");
+  window.addEventListener("popstate",function(){
+   if(skip>0){skip--;return}
+   if(st.length){onPop(st.pop());return}
+   if(armed){history.back();return}
+   armed=true;msg();history.pushState({r:1},"");setTimeout(function(){armed=false},2000)})}
+ return{init:init,size:function(){return st.length},top:function(){return st[st.length-1]},has:function(n){return st.indexOf(n)>=0},
+  push:function(n){st.push(n);history.pushState({l:n},"")},
+  swap:function(n){if(st.length){st[st.length-1]=n;history.replaceState({l:n},"")}else{st.push(n);history.pushState({l:n},"")}},
+  back:function(){history.back()},
+  drop:function(k){st.length-=k;skip++;history.go(-k)}}
+})();
+function hideDr(){$("dr").classList.remove("on");$("sc").classList.remove("on")}
+function hideL(n){if(n==="drawer")hideDr();else if(n==="form")$("fs").classList.remove("on");else if(n==="view")show("dash")}
+$("mb").onclick=function(){Nav.push("drawer");$("dr").classList.add("on");$("sc").classList.add("on")};
+$("sc").onclick=function(){if(Nav.top()==="drawer")Nav.back()};
+$("dr").onclick=function(e){var b=e.target.closest("button");if(!b)return;var v=b.dataset.v;hideDr();
+ if(v==="out"){Nav.drop(1);return logout()}
+ if(v==="shop"){location.href="/";return}
+ if(v==="dash")Nav.drop(Nav.has("view")?2:1);
+ else if(Nav.has("view"))Nav.drop(1);else Nav.swap("view");
+ show(v)};
+function show(v){view=v;["dash","orders","prods","hist"].forEach(function(k){$("v-"+k).classList.toggle("hide",k!==v)});
+ document.querySelectorAll(".dl button[data-v]").forEach(function(b){b.classList.toggle("on",b.dataset.v===v)});
+ if(v==="dash")loadDash();if(v==="orders")loadOrders();if(v==="prods")loadProds();if(v==="hist")loadHist()}
+
+// login
+$("go").onclick=function(){pw=$("pw").value;sessionStorage.setItem("pw",pw);$("le").textContent="";start()};
+$("pw").onkeydown=function(e){if(e.key==="Enter")$("go").click()};
+function start(){api("/api/admin/stats").then(function(){$("login").classList.add("hide");$("mb").classList.remove("hide");show(view);clearInterval(timer);timer=setInterval(tick,10000)}).catch(function(e){if(e.message!=="auth")$("le").textContent=/fetch|network/i.test(e.message)?"Network problem.":e.message})}
+function logout(){var k=Nav.size();if(k)Nav.drop(k);$("fs").classList.remove("on");hideDr();sessionStorage.removeItem("pw");pw="";clearInterval(timer);$("login").classList.remove("hide");$("mb").classList.add("hide");["dash","orders","prods","hist"].forEach(function(k){$("v-"+k).classList.add("hide")});if($("pw").value)$("le").textContent="Wrong password."}
+function tick(){if(view==="dash")loadDash();else if(view==="orders")loadOrders()}
+
+// dashboard
+function count(el,to,pre){var s=performance.now();(function f(t){var p=Math.min((t-s)/700,1);el.textContent=(pre||"")+Math.round(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(f)})(s)}
+function loadDash(){
+ Promise.all([api("/api/admin/stats"),api("/api/admin/orders?days=3")]).then(function(r){
+  var s=r[0],o=r[1].filter(function(x){return x.status==="new"});
+  var items=[["📥 New orders",s.new_orders],["✅ Ready to collect",s.ready_orders],["🧾 Orders today",s.today_orders],["💰 Sales today",s.today_sales,"₹"],["🛍 Products",s.products],["⚠️ Out of stock",s.out_of_stock]];
+  if(!$("stats").children.length||$("stats").dataset.k!==JSON.stringify(s)){$("stats").dataset.k=JSON.stringify(s);
+   $("stats").innerHTML=items.map(function(x,i){return '<div class="st" style="animation-delay:'+i*60+'ms"><small>'+x[0]+'</small><b data-n="'+x[1]+'" data-p="'+(x[2]||"")+'">0</b></div>'}).join("");
+   document.querySelectorAll("#stats b").forEach(function(b){count(b,+b.dataset.n,b.dataset.p)})}
+  $("nb").textContent=s.new_orders;
+  $("dnew").innerHTML=o.length?o.map(orderCard).join(""):'<p class="msg">No new orders right now 👍</p>';
+ }).catch(function(){})}
+
+// orders
+function orderCard(o){
+ var wa="https://wa.me/91"+o.phone+"?text="+encodeURIComponent("Namaste "+o.name+", aapka order #"+o.id+" ("+rs(o.total)+") ready hai. Kripya "+(shop.name||"shop")+" par aakar le jaayein. Dhanyavaad!");
+ var a='<a class="btn b sm" href="tel:'+esc(o.phone)+'">📞 Call</a>';
+ if(o.status==="new")a+='<button class="btn sm" data-s="ready" data-id="'+o.id+'">✔ Mark Ready</button>';
+ if(o.status==="ready")a+='<a class="btn sm" style="background:#25d366" target="_blank" href="'+wa+'">💬 WhatsApp</a><button class="btn o sm" data-s="done" data-id="'+o.id+'">📦 Collected</button>';
+ if(o.status==="new"||o.status==="ready")a+='<button class="btn s sm" data-s="cancelled" data-id="'+o.id+'">Cancel</button>';
+ return '<div class="card"><span class="tag t-'+o.status+'">'+TAG[o.status]+'</span> <small class="msg">#'+o.id+" · "+dt(o.created_at)+'</small>'
+ +'<h3 style="margin:8px 0 2px">'+esc(o.name)+'</h3><div class="msg" style="margin-bottom:6px">📞 '+esc(o.phone)+"</div>"
+ +o.items.map(function(l){return'<div class="row"><span>'+esc(l.name)+(l.brand?" <small class='msg'>("+esc(l.brand)+")</small>":"")+" × "+l.qty+"</span><span>"+rs(l.qty*l.price)+"</span></div>"}).join("")
+ +'<div class="row" style="font-weight:700"><span>Total</span><span>'+rs(o.total)+'</span></div><div class="acts">'+a+"</div></div>"}
+function loadOrders(){
+ api("/api/admin/orders?days=7").then(function(r){O=r;var nw=r.filter(function(o){return o.status==="new"}).length;
+  if(seen>=0&&nw>seen){beep();toast("🔔 New order received!")}seen=nw;$("nb").textContent=nw;renderOrders()}).catch(function(){})}
+function renderOrders(){
+ var F=[["active","Active"],["new","New"],["ready","Ready"],["done","Collected"],["cancelled","Cancelled"]];
+ $("of").innerHTML=F.map(function(f){return '<button class="chip'+(ofl===f[0]?" on":"")+'" data-f="'+f[0]+'">'+f[1]+"</button>"}).join("");
+ var a=O.filter(function(o){return ofl==="active"?(o.status==="new"||o.status==="ready"):o.status===ofl});
+ $("ol").innerHTML=a.length?a.map(orderCard).join(""):'<p class="msg">No orders here.</p>'}
+$("of").onclick=function(e){var b=e.target.closest("button");if(b){ofl=b.dataset.f;renderOrders()}};
+document.addEventListener("click",function(e){var b=e.target.closest("[data-s]");if(!b)return;
+ b.disabled=true;api("/api/admin/orders/"+b.dataset.id+"/status","POST",{status:b.dataset.s}).then(function(){toast("Updated ✓");tick()}).catch(function(x){toast(x.message);b.disabled=false})});
+
+// products
+function loadProds(){api("/api/admin/products").then(function(r){PR=r;renderProds()}).catch(function(){})}
+function renderProds(){
+ var q=$("ps").value.toLowerCase().trim();
+ var a=PR.filter(function(p){return !q||(p.name+" "+p.brand+" "+p.category).toLowerCase().indexOf(q)>=0});
+ $("pc").textContent=a.length+" of "+PR.length+" products";
+ $("cl").innerHTML=Object.keys(PR.reduce(function(m,p){m[p.category]=1;return m},{})).map(function(c){return'<option value="'+esc(c)+'">'}).join("");
+ $("pl").innerHTML=a.map(function(p,i){return '<div class="card" style="animation-delay:'+Math.min(i,10)*30+'ms"><div class="pr"><div class="th">'+(p.img?'<img src="'+esc(p.img)+'" alt="">':(p.emoji||"🛒"))+'</div>'
+  +'<div class="i"><b>'+esc(p.name)+'</b><small class="msg">'+(p.brand?esc(p.brand)+" · ":"")+esc(p.category)+(p.unit?" · "+esc(p.unit):"")+'</small><br><b style="color:var(--br)">'+rs(p.price)+"</b>"+(p.mrp>p.price?' <s class="msg">'+rs(p.mrp)+"</s>":"")+"</div>"
+  +'<label class="sw" title="In stock"><input type="checkbox" data-t="'+p.id+'"'+(p.in_stock?" checked":"")+'><i></i></label></div>'
+  +'<div class="acts"><button class="btn s sm" data-e="'+p.id+'">✏️ Edit</button><button class="btn r sm" data-d="'+p.id+'">🗑 Delete</button></div></div>'}).join("")||'<p class="msg">No products. Tap ＋ to add.</p>'}
+$("ps").oninput=renderProds;
+$("pl").onclick=function(e){var b=e.target.closest("[data-e],[data-d]");if(!b)return;
+ if(b.dataset.e)openForm(PR.find(function(p){return p.id==b.dataset.e}));
+ else{var p=PR.find(function(x){return x.id==b.dataset.d});if(confirm("Delete "+p.name+"?"))api("/api/admin/products/"+p.id,"DELETE").then(function(){toast("Deleted");loadProds()})}};
+$("pl").onchange=function(e){var t=e.target.dataset.t;if(!t)return;api("/api/admin/products/"+t,"PUT",{in_stock:e.target.checked}).then(function(){toast(e.target.checked?"In stock ✓":"Marked out of stock");var p=PR.find(function(x){return x.id==t});if(p)p.in_stock=e.target.checked}).catch(function(x){toast(x.message);loadProds()})};
+function setPv(src,emoji){$("pv").innerHTML=src?'<img src="'+esc(src)+'" alt="">':(emoji||"📷")}
+function openForm(p){
+ editId=p?p.id:null;imgData=null;rmImg=false;$("pf").value="";$("fr").textContent="";
+ $("ft").textContent=p?"Edit product":"Add product";
+ $("fn").value=p?p.name:"";$("fb").value=p?p.brand:"";$("fc").value=p?p.category:"";$("fp").value=p?p.price:"";$("fm").value=p&&p.mrp?p.mrp:"";
+ $("fu").value=p?p.unit:"";$("fe").value=p?p.emoji:"";$("fi").checked=p?p.in_stock:true;setPv(p&&p.img,p&&p.emoji);disc();Nav.push("form");$("fs").classList.add("on")}
+function disc(){var p=+$("fp").value,m=+$("fm").value;$("fd").textContent=(m>p&&p>0)?"🏷 Customers will see "+Math.round((m-p)*100/m)+"% OFF":(m&&p&&m<=p?"MRP should be higher than selling price to show a discount":"")}
+$("fp").oninput=disc;$("fm").oninput=disc;
+$("fab").onclick=function(){openForm(null)};
+$("rm").onclick=function(){imgData=null;rmImg=true;$("pf").value="";setPv(null,$("fe").value)};
+$("pf").onchange=function(){var f=this.files[0];if(!f)return;var im=new Image(),u=URL.createObjectURL(f);
+ im.onload=function(){var m=600,s=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*s);c.height=Math.round(im.height*s);
+  var x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+  imgData=c.toDataURL("image/jpeg",.78);rmImg=false;setPv(imgData);URL.revokeObjectURL(u)};
+ im.onerror=function(){$("fr").textContent="Could not read this image."};im.src=u};
+$("fv").onclick=function(){
+ var b={name:$("fn").value,brand:$("fb").value,category:$("fc").value,price:$("fp").value,mrp:$("fm").value,unit:$("fu").value,emoji:$("fe").value,in_stock:$("fi").checked};
+ if(imgData)b.image=imgData;if(rmImg)b.removeImage=true;
+ $("fv").disabled=true;
+ api(editId?"/api/admin/products/"+editId:"/api/admin/products",editId?"PUT":"POST",b).then(function(){if(Nav.top()==="form")Nav.back();toast("Saved ✓");loadProds()})
+ .catch(function(e){$("fr").textContent=e.message}).then(function(){$("fv").disabled=false})};
+document.querySelectorAll("[data-x]").forEach(function(b){b.onclick=function(){if(Nav.top()==="form")Nav.back()}});
+
+// history
+function loadHist(){$("hl").innerHTML='<div class="spin"></div>';api("/api/admin/orders?days="+$("hd").value).then(function(r){O=r;renderHist()}).catch(function(){})}
+function renderHist(){
+ var s=$("hs").value,q=$("hq").value.toLowerCase().trim();
+ var a=O.filter(function(o){return(!s||o.status===s)&&(!q||(o.name+" "+o.phone+" #"+o.id).toLowerCase().indexOf(q)>=0)});
+ var ok=a.filter(function(o){return o.status!=="cancelled"}),sales=ok.reduce(function(t,o){return t+o.total},0);
+ $("hsum").innerHTML='<div><b>'+a.length+'</b><small class="msg">Orders</small></div><div><b>'+rs(sales)+'</b><small class="msg">Sales</small></div><div><b>'+rs(ok.length?Math.round(sales/ok.length):0)+'</b><small class="msg">Avg order</small></div>';
+ var g={},ks=[];a.forEach(function(o){var k=day(o.created_at);if(!g[k]){g[k]=[];ks.push(k)}g[k].push(o)});
+ $("hl").innerHTML=ks.map(function(k){var t=g[k].filter(function(o){return o.status!=="cancelled"}).reduce(function(x,o){return x+o.total},0);
+  return '<div class="day"><span>'+k+'</span><span>'+g[k].length+" orders · "+rs(t)+"</span></div>"+g[k].map(function(o){
+   return '<details class="card o"><summary><span><b>#'+o.id+" "+esc(o.name)+'</b><br><small class="msg">'+esc(o.phone)+" · "+new Date(o.created_at).toLocaleTimeString("en-IN",{hour:"numeric",minute:"2-digit"})+'</small></span><span style="text-align:right"><b>'+rs(o.total)+'</b><br><span class="tag t-'+o.status+'">'+TAG[o.status]+"</span></span></summary><div style='margin-top:8px'>"
+   +o.items.map(function(l){return'<div class="row"><span>'+esc(l.name)+" × "+l.qty+"</span><span>"+rs(l.qty*l.price)+"</span></div>"}).join("")
+   +'<div class="acts"><a class="btn b sm" href="tel:'+esc(o.phone)+'">📞 Call</a><button class="btn r sm" data-od="'+o.id+'">Delete</button></div></div></details>'}).join("")}).join("")||'<p class="msg" style="margin-top:14px">No orders found.</p>'}
+["hd"].forEach(function(i){$(i).onchange=loadHist});$("hs").onchange=renderHist;$("hq").oninput=renderHist;
+document.addEventListener("click",function(e){var b=e.target.closest("[data-od]");if(b&&confirm("Delete this order from history?"))api("/api/admin/orders/"+b.dataset.od,"DELETE").then(function(){toast("Deleted");loadHist()})});
+
+/*ZIG*/
+function makeZig(){var S=60,sw=0,dir=0,ex=0,y0=0,t0=0;
+ function start(x,y,t){sw=0;dir=0;ex=x;y0=y;t0=t}
+ function move(x,y,t){
+  if(Math.abs(y-y0)>40||t-t0>4000){start(x,y,t);return false}
+  if(!dir){if(Math.abs(x-ex)>S){dir=x>ex?1:-1;ex=x}}
+  else if(dir===1){if(x>ex)ex=x;else if(ex-x>S){dir=-1;sw++;ex=x}}
+  else{if(x<ex)ex=x;else if(x-ex>S){dir=1;sw++;ex=x}}
+  if(sw>=4){start(x,y,t);return true}
+  return false}
+ return{start:start,move:move}}
+/*ENDZIG*/
+// hidden shortcut back to the customer site (zig-zag or two-finger spread on the top bar)
+(function(){
+ var hd=document.querySelector(".hd"),z=makeZig(),pid=null,d0=0;
+ function go(){try{if(navigator.vibrate)navigator.vibrate(40)}catch(e){}location.href="/"}
+ function dist(q){return Math.hypot(q[0].clientX-q[1].clientX,q[0].clientY-q[1].clientY)}
+ hd.addEventListener("pointerdown",function(e){if(pid!==null||(e.pointerType==="mouse"&&e.button!==0))return;pid=e.pointerId;z.start(e.clientX,e.clientY,Date.now())});
+ window.addEventListener("pointermove",function(e){
+  if(e.pointerId!==pid)return;
+  if(e.pointerType==="mouse"&&!(e.buttons&1)){pid=null;return}
+  if(z.move(e.clientX,e.clientY,Date.now())){pid=null;go()}});
+ function end(e){if(e.pointerId===pid)pid=null}
+ window.addEventListener("pointerup",end);window.addEventListener("pointercancel",end);
+ hd.addEventListener("touchstart",function(e){if(e.touches.length===2)d0=dist(e.touches)},{passive:true});
+ hd.addEventListener("touchmove",function(e){if(e.touches.length===2&&d0&&dist(e.touches)-d0>140){d0=0;go()}},{passive:true});
+})();
+Nav.init(hideL,function(){toast("Press back again to exit")});
+if(pw)start();
+if("serviceWorker" in navigator)navigator.serviceWorker.register("/sw.js").catch(function(){});
+</script></body></html>

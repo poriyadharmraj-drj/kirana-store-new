@@ -48,14 +48,19 @@ async function init() {
 
 const app = express();
 app.use(express.json({ limit: "1mb" }));
-app.use(express.static(path.join(__dirname, "public")));
+const WEB = ["index.html", "owner.html", "style.css", "sw.js", "icon-192.png", "icon-512.png"]; // only these files are public
+app.get("/", (req, res) => res.sendFile(path.join(__dirname, "index.html")));
+WEB.forEach(f => app.get("/" + f, (req, res) => res.sendFile(path.join(__dirname, f))));
 
-const manifest = (name, start, id) => ({ name, short_name: name.slice(0, 14), id, start_url: start, scope: "/", display: "standalone",
+const APP_NAME = process.env.APP_NAME || SHOP.name; // name shown under the home-screen icon
+const manifest = (name, short, start, id) => ({ name, short_name: short, id, start_url: start, scope: "/",
+  display: "standalone", display_override: ["standalone", "minimal-ui"], orientation: "portrait", lang: "en",
+  description: "Order groceries online and collect them from the shop.", categories: ["shopping"],
   background_color: "#f1f5fb", theme_color: "#1565c0",
   icons: [{ src: "/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any maskable" },
           { src: "/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" }] });
-app.get("/manifest.json", (req, res) => res.type("application/manifest+json").send(JSON.stringify(manifest(SHOP.name, "/", "/"))));
-app.get("/manifest-owner.json", (req, res) => res.type("application/manifest+json").send(JSON.stringify(manifest(SHOP.name + " Admin", "/owner.html", "/owner.html"))));
+app.get("/manifest.json", (req, res) => res.type("application/manifest+json").send(JSON.stringify(manifest(APP_NAME, APP_NAME.slice(0, 12), "/", "/"))));
+app.get("/manifest-owner.json", (req, res) => res.type("application/manifest+json").send(JSON.stringify(manifest(APP_NAME + " Admin", "Admin", "/owner.html", "/owner.html"))));
 
 const COLS = "id,name,brand,category,unit,price,mrp,emoji,in_stock,(image IS NOT NULL) AS has_img,updated_at";
 const shape = r => ({ id: r.id, name: r.name, brand: r.brand, category: r.category, unit: r.unit, price: r.price,
